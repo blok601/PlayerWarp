@@ -1,0 +1,8 @@
+warp-taken: "&cThat warp has already been created!"
+created-warp: "&aCreated warp&8: &e%warp%"
+invalid-warp: "&cThat warp couldn't be found!"
+remove-warp: "&eDeleted the warp&8: &e%warp%"
+add-vote: "&eVoted for&8: &a%warp%!"
+warping: "&eWarped to&8: &a%warp%!"
+reload: "&eReloaded PlayerWarps!"
+opening: "&eOpening the warp GUI..."

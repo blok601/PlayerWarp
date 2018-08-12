@@ -1,0 +1,8 @@
+name: PlayerWarp
+version: 1.0-SNAPSHOT
+main: me.blok.playerwarp.Core
+description: PlayerWarp Plugin
+commands:
+  pwarp:
+    description: Main player warp command
+    aliases: [playerwarp]
