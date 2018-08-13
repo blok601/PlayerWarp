@@ -13,9 +13,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by Blok on 8/9/2018.
@@ -33,6 +31,7 @@ public class WarpHandler {
 
     private ArrayList<Warp> warps;
     private FileConfiguration configuration;
+    private HashMap<UUID, Long> lastVote = new HashMap<>();
 
     /*
     warpName:
@@ -47,7 +46,8 @@ public class WarpHandler {
         this.warps = new ArrayList<>();
         ConfigurationSection section;
         for (String key : configuration.getKeys(false)) {
-            if(key.equalsIgnoreCase("prefix")) continue; //Prefix not a warp!
+            if (key.equalsIgnoreCase("prefix")) continue; //Prefix not a warp!
+            if(key.equalsIgnoreCase("vote")) continue;
             section = configuration.getConfigurationSection(key);
             Warp warp = new Warp(key);
 
@@ -76,7 +76,7 @@ public class WarpHandler {
                 continue;
             }
 
-            if(!section.contains("votes")){
+            if (!section.contains("votes")) {
                 Bukkit.getLogger().info("[PlayerWarp] Warp: " + key + " doesn't have valid votes! Skipping!");
                 continue;
             }
@@ -85,14 +85,16 @@ public class WarpHandler {
             warp.setLocation(location);
             this.warps.add(warp);
         }
+
+        loadVotes();
     }
 
-    public void reload(){
+    public void reload() {
         save();
         this.warps.clear();
         ConfigurationSection section;
         for (String key : configuration.getKeys(false)) {
-            if(key.equalsIgnoreCase("prefix")) continue; //Prefix not a warp!
+            if (key.equalsIgnoreCase("prefix")) continue; //Prefix not a warp!
             section = configuration.getConfigurationSection(key);
             Warp warp = new Warp(key);
 
@@ -121,7 +123,7 @@ public class WarpHandler {
                 continue;
             }
 
-            if(!section.contains("votes")){
+            if (!section.contains("votes")) {
                 Bukkit.getLogger().info("[PlayerWarp] Warp: " + key + " doesn't have valid votes! Skipping!");
                 continue;
             }
@@ -130,17 +132,33 @@ public class WarpHandler {
             warp.setLocation(location);
             this.warps.add(warp);
         }
+        loadVotes();
     }
 
-    public void save(){
-        for (Warp warp : this.warps){
+    public void save() {
+        for (Warp warp : this.warps) {
             configuration.set(warp.getName() + ".creator", warp.getCreator().toString());
             configuration.set(warp.getName() + ".votes", warp.getVotes());
             configuration.set(warp.getName() + ".item", warp.getItemStack());
             configuration.set(warp.getName() + ".location", warp.getLocation());
         }
 
+        for (Map.Entry<UUID, Long> entry : this.lastVote.entrySet()) {
+            configuration.set("vote." + entry.getKey(), entry.getValue());
+        }
+
         Core.getInstance().saveConfig();
+    }
+
+    public void loadVotes(){
+        ConfigurationSection section = configuration.getConfigurationSection("vote");
+        if(section == null) return;
+        //Nothing to load anyway
+        UUID temp;
+        for (String key : section.getKeys(false)) { //Loop UUIDs
+            temp = UUID.fromString(key);
+            this.lastVote.put(temp, configuration.getLong("vote." + temp.toString()));
+        }
     }
 
     public Warp getWarp(String name) {
@@ -152,33 +170,33 @@ public class WarpHandler {
         return null;
     }
 
-    public void removeWarp(Warp warp){
+    public void removeWarp(Warp warp) {
         configuration.set(warp.getName(), null);
         this.warps.remove(warp);
         Core.getInstance().saveConfig();
     }
 
-    public void addWarp(Warp warp){
+    public void addWarp(Warp warp) {
         this.warps.add(warp);
     }
 
-    public Warp getWarp(ItemStack itemStack){
-        for (Warp warp : this.warps){
-            if(warp.getItemStack().equals(itemStack)){
+    public Warp getWarp(ItemStack itemStack) {
+        for (Warp warp : this.warps) {
+            if (warp.getItemStack().equals(itemStack)) {
                 return warp;
             }
         }
         return null;
     }
 
-    public void openGUI(Player player){
+    public void openGUI(Player player) {
         ArrayList<ItemStack> itemStacks = new ArrayList<>();
 
         ArrayList<Warp> sortedWarps = new ArrayList<>(this.warps);
         sortedWarps.sort(Comparator.comparing(Warp::getVotes).reversed());
 
         ItemBuilder itemBuilder;
-        for (Warp warp : sortedWarps){
+        for (Warp warp : sortedWarps) {
             itemBuilder = new ItemBuilder(warp.getItemStack());
             itemBuilder.name(ChatUtils.format("&a" + warp.getName()));
             itemStacks.add(itemBuilder.make());
@@ -188,4 +206,7 @@ public class WarpHandler {
         new PagedInventory(itemStacks, ChatColor.translateAlternateColorCodes('&', "&6Player Warps"), player);
     }
 
+    public HashMap<UUID, Long> getLastVote() {
+        return lastVote;
+    }
 }

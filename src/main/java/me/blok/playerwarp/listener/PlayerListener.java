@@ -6,6 +6,7 @@ import me.blok.playerwarp.object.handler.WarpHandler;
 import me.blok.playerwarp.utils.ChatUtils;
 import me.blok.playerwarp.utils.ItemBuilder;
 import me.blok.playerwarp.utils.PagedInventory;
+import me.blok.playerwarp.utils.TimeUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -84,6 +85,18 @@ public class PlayerListener implements Listener {
             }
 
             if (event.getClick() == ClickType.RIGHT) {
+                if(WarpHandler.getInstance().getLastVote().containsKey(p.getUniqueId())){
+                    //They have a last vote
+                    if(TimeUtils.hasDayPassed(WarpHandler.getInstance().getLastVote().get(p.getUniqueId()))){
+                        WarpHandler.getInstance().getLastVote().put(p.getUniqueId(), System.currentTimeMillis());
+                    }else{
+                        if(!p.hasPermission("pwarp.bypass")){
+                            p.closeInventory();
+                            p.sendMessage(ChatUtils.message(Messages.getInstance().get("invalid-vote")));
+                            return;
+                        }
+                    }
+                }
                 warp.addVote();
                 p.closeInventory();
                 p.sendMessage(ChatUtils.message(Messages.getInstance().translate(Messages.getInstance().get("add-vote"), warp)));

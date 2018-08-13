@@ -88,6 +88,12 @@ public class PlayerWarpCommand implements CommandExecutor {
                 }
 
                 Warp warp = WarpHandler.getInstance().getWarp(name);
+                if(!warp.getCreator().equals(p.getUniqueId())){
+                    if(!p.hasPermission("pwarp.bypass")){
+                        p.sendMessage(ChatUtils.message(Messages.getInstance().get("not-creator")));
+                        return false;
+                    }
+                }
                 WarpHandler.getInstance().removeWarp(warp);
                 p.sendMessage(ChatUtils.message(Messages.getInstance().translate(Messages.getInstance().get("removed-warp"), warp)));
                 return true;
