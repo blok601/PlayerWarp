@@ -3,6 +3,7 @@ package me.blok.playerwarp;
 import me.blok.playerwarp.command.PlayerWarpCommand;
 import me.blok.playerwarp.listener.PlayerListener;
 import me.blok.playerwarp.object.handler.WarpHandler;
+import me.blok.playerwarp.utils.TimeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,6 +26,7 @@ public final class Core extends JavaPlugin {
         } else {
             USE_NATIVE_VERSION = true;
         }
+        TimeUtils.setCooldownMins(getConfig().getLong("vote-cooldown"));
     }
 
     @Override
