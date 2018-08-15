@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import javax.crypto.MacSpi;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -87,12 +88,13 @@ public class PlayerListener implements Listener {
             if (event.getClick() == ClickType.RIGHT) {
                 if(WarpHandler.getInstance().getLastVote().containsKey(p.getUniqueId())){
                     //They have a last vote
-                    if(TimeUtils.hasDayPassed(WarpHandler.getInstance().getLastVote().get(p.getUniqueId()))){
+                    if(TimeUtils.hasPassed(p)){
                         WarpHandler.getInstance().getLastVote().put(p.getUniqueId(), System.currentTimeMillis());
                     }else{
                         if(!p.hasPermission("pwarp.bypass")){
                             p.closeInventory();
-                            p.sendMessage(ChatUtils.message(Messages.getInstance().get("invalid-vote")));
+                            String error = Messages.getInstance().get("invalid-vote");
+                            p.sendMessage(ChatUtils.message(Messages.getInstance().translate(error, WarpHandler.getInstance().getLastVote().get(p.getUniqueId()))));
                             return;
                         }
                     }

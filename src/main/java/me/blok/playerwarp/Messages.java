@@ -1,6 +1,7 @@
 package me.blok.playerwarp;
 
 import me.blok.playerwarp.object.Warp;
+import me.blok.playerwarp.utils.TimeUtils;
 
 import java.util.HashMap;
 
@@ -35,6 +36,14 @@ public class Messages {
             string = string.replaceAll("%warp%", warp.getName());
         }
         return string;
+    }
+
+    public String translate(String toTranslate, long time){
+        if(toTranslate.contains("%time%")){
+            toTranslate = toTranslate.replaceAll("%time%", TimeUtils.formatMillis(time));
+        }
+
+        return toTranslate;
     }
 
     public HashMap<String, String> getMessages() {

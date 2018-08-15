@@ -10,7 +10,7 @@ public class TimeUtils {
     public static final long MINUTE_IN_MILLIS = 60000;
     public static long COOLDOWN = 0;
 
-    public static boolean hasPassed(long input, Player pl){
+    public static boolean hasPassed(Player pl){
         UUID uuid = pl.getUniqueId();
         if(!WarpHandler.getInstance().getLastVote().containsKey(uuid)){
             return true; // They aren't even in the map so they are okay
@@ -24,5 +24,12 @@ public class TimeUtils {
 
     public static void setCooldownMins(long mins) {
         COOLDOWN = MINUTE_IN_MILLIS * mins;
+    }
+
+    public static String formatMillis(long millis){
+        long mins = (millis / 1000) / 60;
+        long seconds = (millis / 1000) % 60;
+
+        return mins + "minutes and " + seconds + " seconds";
     }
 }
